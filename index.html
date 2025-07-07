@@ -2,113 +2,101 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Galeria Renascentista</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bitcoin Matrix Cyberpunk</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f5f5f5;
-      color: #333;
-    }
-
-    header {
-      background-color: #2e2e2e;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .card {
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      background: black;
       overflow: hidden;
-      transition: transform 0.2s;
+      font-family: monospace;
     }
 
-    .card:hover {
-      transform: scale(1.02);
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
     }
 
-    .card img {
-      width: 100%;
-      height: auto;
-      display: block;
+    .bitcoin {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotateY(0deg);
+      width: 180px;
+      height: 180px;
+      z-index: 10;
+      animation: spin 10s linear infinite;
     }
 
-    .card-title {
-      padding: 15px;
-      font-weight: bold;
-      text-align: center;
+    @keyframes spin {
+      from {
+        transform: translate(-50%, -50%) rotateY(0deg);
+      }
+      to {
+        transform: translate(-50%, -50%) rotateY(360deg);
+      }
     }
 
-    footer {
-      text-align: center;
-      padding: 15px;
-      background-color: #eee;
-      font-size: 0.9rem;
+    .glow {
+      filter: drop-shadow(0 0 12px #f7931a) drop-shadow(0 0 20px #ff9900);
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Galeria de Quadros Renascentistas</h1>
-  </header>
+  <!-- Moeda de Bitcoin girando -->
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/512px-Bitcoin.svg.png"
+       alt="Bitcoin"
+       class="bitcoin glow" />
 
-  <main class="gallery" id="galeria"></main>
-
-  <footer>
-    © 2025 Galeria Renascentista
-  </footer>
+  <!-- Matrix rain canvas -->
+  <canvas id="matrix"></canvas>
 
   <script>
-    const quadros = [
-      {
-        nome: "Mona Lisa - Leonardo da Vinci",
-        imagem: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
-      },
-      {
-        nome: "A Criação de Adão - Michelangelo",
-        imagem: "https://cdn.britannica.com/38/1938-050-4F6B83A4/Creation-of-Adam-ceiling-Sistine-Chapel-Vatican.jpg"
-      },
-      {
-        nome: "O Nascimento de Vênus - Sandro Botticelli",
-        imagem: "https://cdn.britannica.com/94/19494-050-6D4C8E80/Birth-of-Venus-canvas-Sandro-Botticelli-Uffizi.jpg"
-      },
-      {
-        nome: "A Última Ceia - Leonardo da Vinci",
-        imagem: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/%C3%9Altima_Cena_-_Da_Vinci_5.jpg/800px-%C3%9Altima_Cena_-_Da_Vinci_5.jpg"
-      },
-      {
-        nome: "A Escola de Atenas - Rafael",
-        imagem: "https://cdn.britannica.com/97/134297-050-DAE0E5B5/School-of-Athens-Raphael-Apostolic-Palace-Vatican.jpg"
+    // Matrix rain
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()ﾊﾐﾑﾒﾓｶｷｸｹｺｻｼｽｾｿ";
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+
+    const drops = Array.from({ length: columns }).fill(1);
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#00ff99";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
       }
-    ];
+    }
 
-    const galeria = document.getElementById("galeria");
+    setInterval(draw, 35);
 
-    quadros.forEach(quadro => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <img src="${quadro.imagem}" alt="${quadro.nome}">
-        <div class="card-title">${quadro.nome}</div>
-      `;
-      galeria.appendChild(card);
+    // Reajusta canvas ao redimensionar
+    window.addEventListener('resize', () => {
+      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
     });
   </script>
 
